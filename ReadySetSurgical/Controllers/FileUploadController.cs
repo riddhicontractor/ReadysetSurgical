@@ -159,7 +159,9 @@ namespace ReadySetSurgical.Controllers
                                                     {
                                                         InvoiceNumber = InvoiceNumber,
                                                         VendorName = VendorName,
-                                                        ReceiverName = ReceiverName
+                                                        ReceiverName = ReceiverName,
+                                                        CreatedAt = DateTime.Now,
+                                                        FileName = file.FileName
                                                     };
 
                                                     _dataContext.Add(invoiceDetail);
@@ -190,7 +192,8 @@ namespace ReadySetSurgical.Controllers
                                     }
                                     else
                                     {
-                                        ViewBag.FileFailedToUpload = "Please upload valid Invoice or Reciept!";
+                                        UnprocessedFiles++;
+                                        //ViewBag.FileFailedToUpload = "Please upload valid Invoice or Reciept!";
                                         //Console.WriteLine($"Job failed with message: {getExpenseAnalysisResponse.StatusMessage}");
                                     }
                                 }

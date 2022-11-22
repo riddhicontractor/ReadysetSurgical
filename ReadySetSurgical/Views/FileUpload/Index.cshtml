@@ -1,6 +1,28 @@
 ﻿@{
     ViewData["Title"] = "File Upload Page";
 }
+@{
+    if (@ViewBag.FileCreated != null)
+    {
+        <div class="alert alert-success">
+            <span>@ViewBag.FileCreated</span>
+        </div>
+        //if (!string.IsNullOrEmpty(ViewBag.msg))
+        //{
+        //    <script type="text/javascript">alert('@ViewBag.msg');</script>
+        //}
+    }
+    else
+    {
+        if (@ViewBag.FileFailedToUpload != null)
+        {
+            <div class="alert alert-danger">
+                <span>@ViewBag.FileFailedToUpload</span>
+            </div>
+            // <script type="text/javascript">alert('@ViewBag.msg');</script>
+        }
+    }
+}
         <div class="center white">
             <div class="card container1">
                 <div class="card-body">
@@ -43,25 +65,3 @@
 <div id="alert" class=""></div>
 <script src="~/js/jquery-3.6.1.slim.min.js"></script>
 <script src="~/js/fileupload/fileupload.js"></script>
-
-@{
-    if (@ViewBag.FileCreated != null)
-    { 
-        <div class="alert alert-success">
-            <spna>@ViewBag.FileCreated</spna>
-        </div>
-        //if (!string.IsNullOrEmpty(ViewBag.msg))
-        //{
-        //    <script type="text/javascript">alert('@ViewBag.msg');</script>
-        //}
-    }
-    else
-    {
-        if (@ViewBag.FileFailedToUpload != null){
-            <div class="alert alert-danger">
-                <spna>@ViewBag.FileFailedToUpload</spna>
-            </div>
-           // <script type="text/javascript">alert('@ViewBag.msg');</script>
-        }
-    }
-}
