@@ -12,6 +12,8 @@ namespace ReadySetSurgical.Controllers
         private readonly IAmazonS3 s3Client;
         private string BucketName = "aws-s3-bucket-demo-123";
         private IWebHostEnvironment _webHostEnvironment;
+        int processedFiles = 0;
+        int unprocessedFiles = 0;
         public FileUploadController(IWebHostEnvironment webHostEnvironment, IAmazonS3 s3Client)
         {
             this.s3Client = s3Client;
@@ -52,16 +54,19 @@ namespace ReadySetSurgical.Controllers
                         };
                         var response = await s3Client.PutObjectAsync(objectRequest);
                         if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                        {                        
-                            ViewBag.msg = "File uploaded to AWS S3 successfully !";
+                        {
+                            processedFiles++;
+                            //ViewBag.FileCreated = "File uploaded to AWS S3 successfully !";
                         }
                         else
                         {
-                            ViewBag.FileFailedToUpload = "Failed !";
+                            unprocessedFiles++;
+                            //ViewBag.FileFailedToUpload = "Failed !";
                         }
                     }
                 }
             }
+            ViewBag.FileCreated = "Total Processed Files = " + processedFiles + " & Total Unprocessed Files = " + unprocessedFiles;
             return View("Index");
         }
     }
