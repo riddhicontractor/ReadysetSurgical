@@ -1,6 +1,46 @@
 ﻿@{
     ViewData["Title"] = "File Upload Page";
 }
+<div class="center white">
+    <div class="card container4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mx-auto">
+                    <div class="row">
+                        <div class="col-md-12 black">
+                            <h1>Upload File to AWS S3</h1>
+                        </div>
+                    </div>
+                    <div class="card black">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <form method="post" enctype="multipart/form-data" asp-controller="FileUpload" asp-action="FileUpload">
+                                        <div class="form-group">
+                                            <div class="col">
+                                                <input type="radio" name="fileupload" id="fileupload" value="Upload file" checked /> UPLOAD FILE  
+                                                <input type="radio" name="fileupload" id="folderupload" value="Upload folder" /> UPLOAD FOLDER
+                                                <h1></h1>
+                                                <input type="file" name="formFile" webkitdirectory multiple id="file" data-file_types="pdf|jpg|jpeg|png|tiff" required />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col">
+                                                <input type="submit" value="Upload" />
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<div id="alert" class=""></div>
 @{
     if (@ViewBag.FileCreated != null)
     {
@@ -23,45 +63,5 @@
         }
     }
 }
-        <div class="center white">
-            <div class="card container1">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mx-auto">
-                            <div class="row">
-                                <div class="col-md-12 black">
-                                    <h1>Upload File to AWS S3</h1>
-                                </div>
-                            </div>
-                            <div class="card black">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col">
-                                            <form method="post" enctype="multipart/form-data" asp-controller="FileUpload" asp-action="FileUpload">
-                                                <div class="form-group">
-                                                    <div class="col">
-                                                        <input type="radio" name="fileupload" id="fileupload" value="Upload file" checked /> UPLOAD FILE  
-                                                        <input type="radio" name="fileupload" id="folderupload" value="Upload folder" /> UPLOAD FOLDER
-                                                        <h1></h1>
-                                                        <input type="file" name="formFile" webkitdirectory multiple id="file" data-file_types="pdf|jpg|jpeg|png|tiff" required />
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="col">
-                                                        <input type="submit" value="Upload" />
-                                                    </div>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-<br />
-<div id="alert" class=""></div>
 <script src="~/js/jquery-3.6.1.slim.min.js"></script>
 <script src="~/js/fileupload/fileupload.js"></script>
