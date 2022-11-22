@@ -1,8 +1,6 @@
 ﻿@{
     ViewData["Title"] = "File Upload Page";
 }
-
-
         <div class="center white">
             <div class="card container1">
                 <div class="card-body">
@@ -20,7 +18,9 @@
                                             <form method="post" enctype="multipart/form-data" asp-controller="FileUpload" asp-action="FileUpload">
                                                 <div class="form-group">
                                                     <div class="col">
-                                                        <input type="file" name="formFile" multiple id="file" data-file_types="pdf|jpg|jpeg|png|tiff" required />
+                                                        <input type="radio" name="fileupload" id="fileupload" value="Upload file" checked/>Upload file
+                                                        <input type="radio" name="fileupload" id="folderupload" value="Upload folder" />Upload folder
+                                                        <input type="file" name="formFile" webkitdirectory multiple id="file" data-file_types="pdf|jpg|jpeg|png|tiff" required />
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -38,7 +38,10 @@
                 </div>
             </div>
         </div>
-
+<br />
+<div id="alert" class=""></div>
+<script src="~/js/jquery-3.6.1.slim.min.js"></script>
+<script src="~/js/fileupload/fileupload.js"></script>
 
 @{
     if (@ViewBag.FileCreated != null)
@@ -46,10 +49,10 @@
         <div class="alert alert-success">
             <spna>@ViewBag.FileCreated</spna>
         </div>
-        if (!string.IsNullOrEmpty(ViewBag.msg))
-        {
-            <script type="text/javascript">alert('@ViewBag.msg');</script>
-        }
+        //if (!string.IsNullOrEmpty(ViewBag.msg))
+        //{
+        //    <script type="text/javascript">alert('@ViewBag.msg');</script>
+        //}
     }
     else
     {
@@ -57,10 +60,7 @@
             <div class="alert alert-danger">
                 <spna>@ViewBag.FileFailedToUpload</spna>
             </div>
+           // <script type="text/javascript">alert('@ViewBag.msg');</script>
         }
     }
 }
-
-@*<div id="alert" class=""></div>
-<script src="~/js/jquery-3.6.1.slim.min.js"></script>
-<script src="~/js/fileupload/fileupload.js"></script>*@
