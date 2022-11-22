@@ -61,7 +61,6 @@ namespace ReadySetSurgical.Controllers
                                 var objectRequest = new PutObjectRequest()
                                 {
                                     BucketName = BucketName,
-                                    //Key = $"{DateTime.Now:yyyyMMddhhmmss}-{formFile.FileName}"
                                     Key = Path.GetFileName(file.FileName),
                                     InputStream = file.OpenReadStream()
                                 };
@@ -168,9 +167,7 @@ namespace ReadySetSurgical.Controllers
                                                     _dataContext.SaveChanges();
 
                                                     ProcessedFiles++;
-
-                                                    // ViewBag.FileCreated = "File uploaded to AWS S3 and extracted successfully !";
-                                                    //end
+                                                //end
 
                                                     // Check to see if there are no more pages of data. If no then break.
                                                     if (string.IsNullOrEmpty(getExpenseAnalysisResponse.NextToken))
@@ -184,7 +181,6 @@ namespace ReadySetSurgical.Controllers
                                                 else
                                                 {
                                                     UnprocessedFiles++;
-                                                    //ViewBag.FileFailedToUpload = "We can’t find any summary fields in " + file.FileName + " file. Please upload valid Invoice or Reciept!";
                                                 }
                                             }
 
@@ -193,8 +189,6 @@ namespace ReadySetSurgical.Controllers
                                     else
                                     {
                                         UnprocessedFiles++;
-                                        //ViewBag.FileFailedToUpload = "Please upload valid Invoice or Reciept!";
-                                        //Console.WriteLine($"Job failed with message: {getExpenseAnalysisResponse.StatusMessage}");
                                     }
                                 }
                                 else
@@ -203,15 +197,6 @@ namespace ReadySetSurgical.Controllers
                                 }
 
                                 ViewBag.FileCreated = "Total Processed Files = " + ProcessedFiles + " & Total Unprocessed Files = " + UnprocessedFiles;
-
-                                //if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                                //{
-                                //    ViewBag.msg = "File uploaded to AWS S3 successfully !";
-                                //}
-                                //else
-                                //{
-                                //    ViewBag.FileFailedToUpload = "Failed !";
-                                //}
                             }
                         }
                         else
