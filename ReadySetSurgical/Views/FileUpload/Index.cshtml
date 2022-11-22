@@ -8,7 +8,7 @@
                 <div class="col-md-6 mx-auto">
                     <div class="row">
                         <div class="col-md-12 black">
-                            <h1>Upload File to AWS S3</h1>
+                            <h1>Upload Invoices/Reciepts</h1>
                         </div>
                     </div>
                     <div class="card black">
@@ -52,15 +52,12 @@
         //    <script type="text/javascript">alert('@ViewBag.msg');</script>
         //}
     }
-    else
+    if (@ViewBag.FileFailedToUpload != null)
     {
-        if (@ViewBag.FileFailedToUpload != null)
-        {
-            <div class="alert alert-danger">
-                <span>@ViewBag.FileFailedToUpload</span>
-            </div>
-            // <script type="text/javascript">alert('@ViewBag.msg');</script>
-        }
+        <div class="alert alert-danger">
+            <span>@ViewBag.FileFailedToUpload</span>
+        </div>
+        // <script type="text/javascript">alert('@ViewBag.msg');</script>
     }
 }
 <script src="~/js/jquery-3.6.1.slim.min.js"></script>

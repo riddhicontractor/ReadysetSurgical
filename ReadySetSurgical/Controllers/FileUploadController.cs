@@ -16,12 +16,12 @@ namespace ReadySetSurgical.Controllers
         private readonly IAmazonS3 s3Client;
         private string BucketName = "aws-s3-bucket-demo-123";
         private IWebHostEnvironment _webHostEnvironment;
-        string ?InvoiceNumber;
-        string ?VendorName;
-        string ?ReceiverName;
+        public string ?InvoiceNumber;
+        public string? VendorName;
+        public string? ReceiverName;
         readonly DataContext _dataContext;
-        int ProcessedFiles = 0;
-        int UnprocessedFiles = 0;
+        public int ProcessedFiles = 0;
+        public int UnprocessedFiles = 0;
 
         public FileUploadController(IWebHostEnvironment webHostEnvironment, IAmazonS3 s3Client, DataContext dataContext)
         {
@@ -40,14 +40,14 @@ namespace ReadySetSurgical.Controllers
             try
             {
                 var bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(s3Client, BucketName);
-                if (!bucketExists)
+                if (!bucketExists) //create a new bucket in AWS (if not exists)
                 {
                     var bucketRequest = new PutBucketRequest()
                     {
                         BucketName = BucketName,
                         UseClientRegion = true
                     };
-                    await s3Client.PutBucketAsync(bucketRequest); //create a new bucket in AWS (if not exists)
+                    await s3Client.PutBucketAsync(bucketRequest);
                 }
 
                 using (var textractClient = new AmazonTextractClient(RegionEndpoint.APSouth1))
@@ -61,11 +61,12 @@ namespace ReadySetSurgical.Controllers
                                 var objectRequest = new PutObjectRequest()
                                 {
                                     BucketName = BucketName,
-                                    //Key = $"{DateTime.Now:yyyyMMddhhmmss}-{formFile.FileName}"
                                     Key = Path.GetFileName(file.FileName),
                                     InputStream = file.OpenReadStream()
                                 };
-                                var response = await s3Client.PutObjectAsync(objectRequest); //add file to bucket
+
+                                //add file to bucket
+                                var response = await s3Client.PutObjectAsync(objectRequest);
 
                                 if (response != null)
                                 {
@@ -169,8 +170,7 @@ namespace ReadySetSurgical.Controllers
 
                                                     ProcessedFiles++;
 
-                                                    // ViewBag.FileCreated = "File uploaded to AWS S3 and extracted successfully !";
-                                                    //end
+                                                //end
 
                                                     // Check to see if there are no more pages of data. If no then break.
                                                     if (string.IsNullOrEmpty(getExpenseAnalysisResponse.NextToken))
@@ -184,7 +184,6 @@ namespace ReadySetSurgical.Controllers
                                                 else
                                                 {
                                                     UnprocessedFiles++;
-                                                    //ViewBag.FileFailedToUpload = "We can’t find any summary fields in " + file.FileName + " file. Please upload valid Invoice or Reciept!";
                                                 }
                                             }
 
@@ -193,25 +192,12 @@ namespace ReadySetSurgical.Controllers
                                     else
                                     {
                                         UnprocessedFiles++;
-                                        //ViewBag.FileFailedToUpload = "Please upload valid Invoice or Reciept!";
-                                        //Console.WriteLine($"Job failed with message: {getExpenseAnalysisResponse.StatusMessage}");
                                     }
                                 }
                                 else
                                 {
                                     ViewBag.FileFailedToUpload = "Uploading file to AWS S3 failed!";
                                 }
-
-                                ViewBag.FileCreated = "Total Processed Files = " + ProcessedFiles + " & Total Unprocessed Files = " + UnprocessedFiles;
-
-                                //if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                                //{
-                                //    ViewBag.msg = "File uploaded to AWS S3 successfully !";
-                                //}
-                                //else
-                                //{
-                                //    ViewBag.FileFailedToUpload = "Failed !";
-                                //}
                             }
                         }
                         else
@@ -219,6 +205,15 @@ namespace ReadySetSurgical.Controllers
                             ViewBag.FileFailedToUpload = "Failed!";
                         }
                     }
+                }
+
+                if (ProcessedFiles != 0)
+                {
+                    ViewBag.FileCreated = "Total Processed Files = " + ProcessedFiles;
+                }
+                if (UnprocessedFiles != 0)
+                {
+                    ViewBag.FileFailedToUpload = "Total Unprocessed Files = " + UnprocessedFiles;
                 }
             }
             catch(Exception ex)
