@@ -1,5 +1,23 @@
 $(document).ready(function () {
+    changeFileAttribute();
+    function changeFileAttribute() {
+        if ($("#fileupload").is(":checked")) {
+            //file upload
+            $("#file").removeAttr("webkitdirectory");
+        }
+        else {
+            //folder upload
+            $("#file").attr("webkitdirectory", "");
+        }
+    }
 
+    //changed
+    $('#fileupload').on('change', function () {
+        changeFileAttribute();
+    });
+    $('#folderupload').on('change', function () {
+        changeFileAttribute();
+    });
     $('#file').on('change', function () {
         var numb = $(this)[0].files[0].size / 1024 / 1024; //count file size
         var resultid = $(this).val().split(".");
