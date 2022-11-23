@@ -169,7 +169,6 @@ namespace ReadySetSurgical.Controllers
                                                     _dataContext.SaveChanges();
 
                                                     ProcessedFiles++;
-
                                                 //end
 
                                                     // Check to see if there are no more pages of data. If no then break.
