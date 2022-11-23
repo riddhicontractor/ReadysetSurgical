@@ -55,14 +55,11 @@
         //    <script type="text/javascript">alert('@ViewBag.msg');</script>
         //}
     }
-    else
+
+    if (@ViewBag.FileFailedToUpload != null)
     {
-        if (@ViewBag.FileFailedToUpload != null)
-        {
-            <div class="alert alert-danger">
-                <spna>@ViewBag.FileFailedToUpload</spna>
-            </div>
-            // <script type="text/javascript">alert('@ViewBag.msg');</script>
-        }
+        <div class="alert alert-danger">
+            <spna>@ViewBag.FileFailedToUpload</spna>
+        </div>
     }
 }

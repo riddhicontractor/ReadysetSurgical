@@ -10,10 +10,10 @@ namespace ReadySetSurgical.Controllers
     public class FileUploadController : Controller
     {
         private readonly IAmazonS3 s3Client;
-        private string BucketName = "aws-s3-bucket-demo-123";
+        private string BucketName = "aws-s3-demo-data"; //congifure Lamdbda Function
         private IWebHostEnvironment _webHostEnvironment;
-        int processedFiles = 0;
-        int unprocessedFiles = 0;
+        int UploadedFiles = 0;
+        int ErrorFiles = 0;
         public FileUploadController(IWebHostEnvironment webHostEnvironment, IAmazonS3 s3Client)
         {
             this.s3Client = s3Client;
@@ -29,14 +29,14 @@ namespace ReadySetSurgical.Controllers
         public async Task<IActionResult> FileUploadAsync(List<IFormFile> formFile)
         {
             var bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(s3Client, BucketName);
-            if (!bucketExists)
+            if (!bucketExists) //create a new bucket in AWS S3(if not exists)
             {
                 var bucketRequest = new PutBucketRequest()
                 {
                     BucketName = BucketName,
                     UseClientRegion = true
                 };
-                await s3Client.PutBucketAsync(bucketRequest); //create a new bucket in AWS
+                await s3Client.PutBucketAsync(bucketRequest);
             }
 
             using (var s3Client = new AmazonS3Client(RegionEndpoint.APSouth1))
@@ -44,29 +44,37 @@ namespace ReadySetSurgical.Controllers
                 if (formFile.Count > 0)
                 {
                     foreach (var file in formFile)
-                    {
+                    {                       
                         var objectRequest = new PutObjectRequest()
                         {
                             BucketName = BucketName,
-                            //Key = $"{DateTime.Now:yyyyMMddhhmmss}-{formFile.FileName}"
                             Key = Path.GetFileName(file.FileName),
                             InputStream = file.OpenReadStream()
                         };
+
+                        //add files to S3
                         var response = await s3Client.PutObjectAsync(objectRequest);
                         if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                         {
-                            processedFiles++;
-                            //ViewBag.FileCreated = "File uploaded to AWS S3 successfully !";
+                            UploadedFiles++;
                         }
                         else
                         {
-                            unprocessedFiles++;
-                            //ViewBag.FileFailedToUpload = "Failed !";
+                            ErrorFiles++;
                         }
                     }
                 }
             }
-            ViewBag.FileCreated = "Total Processed Files = " + processedFiles + " & Total Unprocessed Files = " + unprocessedFiles;
+
+            if(UploadedFiles > 0)
+            {
+                ViewBag.FileCreated = "Total Uploaded Files to AWS S3 = " + UploadedFiles;
+            }
+            if (ErrorFiles > 0)
+            {
+                ViewBag.FileFailedToUpload = "Error Files = " + ErrorFiles;
+            }
+
             return View("Index");
         }
     }
