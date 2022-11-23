@@ -19,6 +19,7 @@ namespace ReadySetSurgical.Controllers
         public string ?InvoiceNumber;
         public string? VendorName;
         public string? ReceiverName;
+        public string? OtherName;
         readonly DataContext _dataContext;
         public int ProcessedFiles = 0;
         public int UnprocessedFiles = 0;
@@ -149,7 +150,7 @@ namespace ReadySetSurgical.Controllers
                                                                 if (field.Type.Text == "NAME")
                                                                 {
                                                                     Console.WriteLine($"Receiver Name = {field.ValueDetection.Text}");
-                                                                    ReceiverName = field.ValueDetection.Text;
+                                                                    OtherName = field.ValueDetection.Text;
                                                                 }
                                                             }
                                                         }
@@ -160,7 +161,7 @@ namespace ReadySetSurgical.Controllers
                                                     {
                                                         InvoiceNumber = InvoiceNumber,
                                                         VendorName = VendorName,
-                                                        ReceiverName = ReceiverName,
+                                                        ReceiverName = ReceiverName != "" ? ReceiverName : OtherName,
                                                         CreatedAt = DateTime.Now,
                                                         FileName = file.FileName
                                                     };
