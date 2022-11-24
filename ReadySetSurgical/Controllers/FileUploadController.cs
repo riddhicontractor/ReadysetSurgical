@@ -161,7 +161,7 @@ namespace ReadySetSurgical.Controllers
                                                     {
                                                         InvoiceNumber = InvoiceNumber,
                                                         VendorName = VendorName,
-                                                        ReceiverName = ReceiverName != "" ? ReceiverName : OtherName,
+                                                        ReceiverName = ReceiverName != null ? ReceiverName : OtherName,
                                                         CreatedAt = DateTime.Now,
                                                         FileName = file.FileName
                                                     };
