@@ -25,7 +25,6 @@ namespace ReadySetSurgical.Controllers
         }
 
         [HttpPost]
-
         public async Task<IActionResult> FileUploadAsync(List<IFormFile> formFile)
         {
             var bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(s3Client, BucketName);

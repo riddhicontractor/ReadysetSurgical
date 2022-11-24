@@ -7,10 +7,16 @@ namespace ReadySetSurgical.Controllers
     {
         public string connectionString = "server=sample-instance.c53wji5mnp4g.ap-south-1.rds.amazonaws.com;User Id=Admin;Password=Jz7XXc8iqCHjJTL;database=sample;Trusted_Connection=True;TrustServerCertificate=Yes;Integrated Security=false;";
         List<InvoiceDetails> details = new List<InvoiceDetails>();
+        List<ErrorLog> logs = new List<ErrorLog>();
         public IActionResult Index()
         {
             FetchData();
             return View(details);
+        }
+        public IActionResult Index1()
+        {
+            FetchErrorData();
+            return View(logs);
         }
 
         public void FetchData()
@@ -43,12 +49,47 @@ namespace ReadySetSurgical.Controllers
                         });
                     }
                     conn.Close();
-                }   
+                }
             }
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }  
+        }
+
+        public void FetchErrorData()
+        {
+            try
+            {
+                using (var conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+
+                    SqlCommand cmd = new SqlCommand();
+                    cmd.Connection = conn;
+
+                    cmd.CommandText = "SELECT * FROM [sample].[dbo].[ErrorLog]";
+
+                    SqlDataReader dr;
+
+                    dr = cmd.ExecuteReader();
+
+                    while (dr.Read())
+                    {
+                        logs.Add(new ErrorLog()
+                        {
+                            Id = Convert.ToInt32(dr["Id"]),
+                            FileName = dr["FileName"].ToString(),
+                            CreatedAt = Convert.ToDateTime(dr["CreatedAt"])
+                        });
+                    }
+                    conn.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

@@ -1,11 +1,8 @@
 ﻿@{
     ViewData["Title"] = "File List";
-    string[] TableHeaders = new string[] { 
+    string[] TableHeaders = new string[] {
        "Id"
       ,"File Name"
-      ,"Invoice Number"
-      ,"Vendor Name"
-      ,"Receiver Name"
       ,"Created At"
     };
 }
@@ -15,24 +12,22 @@
         <h1>File List</h1>
     </div>
 </div>
-<br/>
+<br />
 <div class="row">
     <div class="col">
         <a asp-controller="FileList"
            asp-action="Index">Success Files</a>
         <a asp-controller="FileList"
            asp-action="Index1">Error Files</a>
-        @*<input class="btn btn-primary" type="button" value="Success Files" />
-        <input class="btn btn-danger" type="button" value="Error Files" />*@
     </div>
 </div>
-<br/>
+<br />
 <div class="table">
     <table class="table table-bordered table-hover center">
         <thead>
             <tr>
                 @{
-                    foreach(var head in TableHeaders)
+                    foreach (var head in TableHeaders)
                     {
                         <th>
                             @head
@@ -50,9 +45,6 @@
                         <tr>
                             <td>@Data.Id</td>
                             <td>@Data.FileName</td>
-                            <td>@Data.InvoiceNumber</td>
-                            <td>@Data.VendorName</td>
-                            <td>@Data.ReceiverName</td>
                             <td>@Data.CreatedAt</td>
                         </tr>
                     }
