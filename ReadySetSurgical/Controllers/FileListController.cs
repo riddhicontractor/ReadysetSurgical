@@ -10,16 +10,20 @@ namespace ReadySetSurgical.Controllers
         List<ErrorLog> logs = new List<ErrorLog>();
         public IActionResult Index()
         {
-            FetchData();
+            return View();
+        }
+        public IActionResult SuccessIndex()
+        {
+            FetchSuccessData();
             return View(details);
         }
-        public IActionResult Index1()
+        public IActionResult ErrorIndex()
         {
             FetchErrorData();
             return View(logs);
         }
 
-        public void FetchData()
+        public void FetchSuccessData()
         {
             try
             {

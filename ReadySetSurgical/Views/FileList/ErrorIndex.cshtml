@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "File List";
+    string[] TableHeaders = new string[] {
+       "Id"
+      ,"File Name"
+      ,"Created At"
+    };
+}
+<div class="card">
+    <div class="card-body">
+        <div class="row center">
+            <div class="col">
+                <h1>File List</h1>
+            </div>
+        </div>
+        <div class="row center">
+            <div class="col">
+                <a asp-controller="FileList"
+                   asp-action="SuccessIndex"><b>Success Files</b></a> |
+                <a asp-controller="FileList"
+                   asp-action="ErrorIndex"><b>Error Files</b></a>
+            </div>
+        </div>
+        <br />
+        <div class="table">
+            <table class="table table-bordered table-hover center">
+                <thead>
+                    <tr>
+                        @{
+                            foreach (var head in TableHeaders)
+                            {
+                                <th>
+                                    @head
+                                </th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model != null)
+                        {
+                            foreach (var Data in Model)
+                            {
+                                <tr>
+                                    <td>@Data.Id</td>
+                                    <td>@Data.FileName</td>
+                                    <td>@Data.CreatedAt</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
