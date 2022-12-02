@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ReadySetSurgical.Data;
 using System.Data.SqlClient;
 
 namespace ReadySetSurgical.Controllers
 {
     public class FileListController : Controller
     {
+        //private readonly SqlConnection _connection;
+        DataContext dataContext;
+
+        _dataContext = dataContext;
         //public string connectionString = "server=sample-instance.c53wji5mnp4g.ap-south-1.rds.amazonaws.com;User Id=Admin;Password=Jz7XXc8iqCHjJTL;database=sample;Trusted_Connection=True;TrustServerCertificate=Yes;Integrated Security=false;";
         List<InvoiceDetails> details = new List<InvoiceDetails>();
         List<ErrorLog> logs = new List<ErrorLog>();
