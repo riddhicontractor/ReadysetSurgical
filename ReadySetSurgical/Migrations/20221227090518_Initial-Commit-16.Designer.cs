@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ReadySetSurgical.Data;
 
@@ -11,9 +12,11 @@ using ReadySetSurgical.Data;
 namespace ReadySetSurgical.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221227090518_Initial-Commit-16")]
+    partial class InitialCommit16
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +25,7 @@ namespace ReadySetSurgical.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ReadySetSurgical.Models.ErrorLog", b =>
+            modelBuilder.Entity("ErrorLog", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,10 +41,10 @@ namespace ReadySetSurgical.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Errorlog");
+                    b.ToTable("logs");
                 });
 
-            modelBuilder.Entity("ReadySetSurgical.Models.InvoiceDetail", b =>
+            modelBuilder.Entity("InvoiceDetails", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -66,7 +69,7 @@ namespace ReadySetSurgical.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InvoiceDetail");
+                    b.ToTable("details");
                 });
 #pragma warning restore 612, 618
         }

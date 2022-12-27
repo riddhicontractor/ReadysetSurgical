@@ -10,25 +10,44 @@ namespace ReadySetSurgical.Controllers
     public class FileUploadController : Controller
     {
         private readonly IAmazonS3 s3Client;
-        private string BucketName = "aws-s3-demo-data"; //congifure Lamdbda Function
+        private string BucketName = "aws-s3-demo-data";
         private IWebHostEnvironment _webHostEnvironment;
         int UploadedFiles = 0;
         int ErrorFiles = 0;
+
+        /// <summary>
+        /// Constructs an instance with a preconfigured S3 client and webHostEnvironment.
+        /// </summary>
+        /// <param name="webHostEnvironment"></param>
+        /// <param name="s3Client"></param>
         public FileUploadController(IWebHostEnvironment webHostEnvironment, IAmazonS3 s3Client)
         {
             this.s3Client = s3Client;
             _webHostEnvironment = webHostEnvironment;
         }
+
+        /// <summary>
+        /// This method is called for every FileUpload Controller invocation.
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             return View();
         }
 
+        /// <summary>
+        /// This method is called for uploading files/folder to AWS S3. It create a new bucket in AWS S3(if not exists).
+        /// It returns the total number of files uploaded to AWS S3.
+        /// </summary>
+        /// <param name="formFile"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> FileUploadAsync(List<IFormFile> formFile)
         {
             var bucketExists = await AmazonS3Util.DoesS3BucketExistV2Async(s3Client, BucketName);
-            if (!bucketExists) //create a new bucket in AWS S3(if not exists)
+
+        //create a new bucket in AWS S3(if not exists)
+            if (!bucketExists) 
             {
                 var bucketRequest = new PutBucketRequest()
                 {
@@ -51,7 +70,7 @@ namespace ReadySetSurgical.Controllers
                             InputStream = file.OpenReadStream()
                         };
 
-                        //add files to S3
+                    //add files to AWS S3
                         var response = await s3Client.PutObjectAsync(objectRequest);
                         if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
                         {

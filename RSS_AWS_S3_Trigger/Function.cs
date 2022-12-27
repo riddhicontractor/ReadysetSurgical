@@ -46,6 +46,8 @@ public class Function
     /// <summary>
     /// This method is called for every Lambda invocation. This method takes in an S3 event object and can be used 
     /// to respond to S3 notifications.
+    /// It invokes the AWS Textract Expense API by passing the AWS S3 file and will extract data from it.
+    /// The extracted data will be stored in AWS RDS.
     /// </summary>
     /// <param name="evnt"></param>
     /// <param name="context"></param>
@@ -70,183 +72,183 @@ public class Function
 
             using (var textractClient = new AmazonTextractClient(RegionEndpoint.APSouth1))
             {
-                using (var s3Client = new AmazonS3Client(RegionEndpoint.APSouth1))
+                using AmazonS3Client s3Client = new(RegionEndpoint.APSouth1);
+                context.Logger.LogInformation("Start document detection job");
+
+            //AWS Textract Expense API
+
+                var expenseRequest = await textractClient.StartExpenseAnalysisAsync(new StartExpenseAnalysisRequest
                 {
-                    context.Logger.LogInformation("Start document detection job");
-
-                    //AWS Expense API
-
-                    var expenseRequest = await textractClient.StartExpenseAnalysisAsync(new StartExpenseAnalysisRequest
+                    DocumentLocation = new DocumentLocation
                     {
-                        DocumentLocation = new DocumentLocation
+                        S3Object = new Amazon.Textract.Model.S3Object
                         {
-                            S3Object = new Amazon.Textract.Model.S3Object
-                            {
-                                Bucket = file.BucketName,
-                                Name = file.Key
-                            }
+                            Bucket = file.BucketName,
+                            Name = file.Key
                         }
-                    });
+                    }
+                });
 
-                    var expenseRequestId = expenseRequest.ResponseMetadata.RequestId;
+                var expenseRequestId = expenseRequest.ResponseMetadata.RequestId;
 
-                    context.Logger.LogInformation("expenseRequestId = " + expenseRequestId);
+                context.Logger.LogInformation("expenseRequestId = " + expenseRequestId);
 
-                    var GetExpenseAnalysis = new GetExpenseAnalysisRequest
-                    {
-                        JobId = expenseRequest.JobId
-                    };
+                var GetExpenseAnalysis = new GetExpenseAnalysisRequest
+                {
+                    JobId = expenseRequest.JobId
+                };
 
-                    context.Logger.LogInformation("JobId = " + GetExpenseAnalysis.JobId);
+                context.Logger.LogInformation("JobId = " + GetExpenseAnalysis.JobId);
 
-                    context.Logger.LogInformation("Poll for detect job to complete");
+                context.Logger.LogInformation("Poll for detect job to complete");
 
-                    GetExpenseAnalysisResponse getExpenseAnalysisResponse;
+                GetExpenseAnalysisResponse getExpenseAnalysisResponse;
 
-                    // Poll till job is no longer in progress.
+                // Poll till job is no longer in progress.
+                do
+                {
+                    Thread.Sleep(1000);
+                    getExpenseAnalysisResponse = await textractClient.GetExpenseAnalysisAsync(GetExpenseAnalysis);
+
+                } while (getExpenseAnalysisResponse.JobStatus == JobStatus.IN_PROGRESS);
+
+                context.Logger.LogInformation("Print out results if the job was successful!");
+
+                // If the job was successful loop through the pages of results and print the detected text
+                if (getExpenseAnalysisResponse.JobStatus == JobStatus.SUCCEEDED)
+                {
                     do
                     {
-                        Thread.Sleep(1000);
-                        getExpenseAnalysisResponse = await textractClient.GetExpenseAnalysisAsync(GetExpenseAnalysis);
+                        List<ExpenseDocument> docs = getExpenseAnalysisResponse.ExpenseDocuments;
 
-                    } while (getExpenseAnalysisResponse.JobStatus == JobStatus.IN_PROGRESS);
-
-                    context.Logger.LogInformation("Print out results if the job was successful!");
-
-                    // If the job was successful loop through the pages of results and print the detected text
-                    if (getExpenseAnalysisResponse.JobStatus == JobStatus.SUCCEEDED)
-                    {
-                        do
+                        foreach (var doc in docs)
                         {
-                            List<ExpenseDocument> docs = getExpenseAnalysisResponse.ExpenseDocuments;
+                            List<ExpenseField> _summaryFields = doc.SummaryFields;
 
-                            foreach (var doc in docs)
+                            if (_summaryFields.Count > 0)
                             {
-                                List<ExpenseField> _summaryFields = doc.SummaryFields;
-
-                                if (_summaryFields.Count > 0)
+                                foreach (var field in _summaryFields)
                                 {
-                                    foreach (var field in _summaryFields)
+                                    if (field.Type.Text == "INVOICE_RECEIPT_ID")
                                     {
-                                        if (field.Type.Text == "INVOICE_RECEIPT_ID")
-                                        {
-                                            context.Logger.LogInformation($"Invoice Id = {field.ValueDetection.Text}");
-                                            InvoiceNumber = field.ValueDetection.Text;
-                                        }
-                                        List<ExpenseGroupProperty> _expenseGroupProperties = field.GroupProperties;
+                                        context.Logger.LogInformation($"Invoice Id = {field.ValueDetection.Text}");
+                                        InvoiceNumber = field.ValueDetection.Text;
+                                    }
+                                    List<ExpenseGroupProperty> _expenseGroupProperties = field.GroupProperties;
 
-                                        foreach (var group in _expenseGroupProperties)
+                                    foreach (var group in _expenseGroupProperties)
+                                    {
+                                        if (group.Types.Contains("VENDOR"))
                                         {
-                                            if (group.Types.Contains("VENDOR"))
+                                            if (field.Type.Text == "NAME")
                                             {
-                                                if (field.Type.Text == "NAME")
-                                                {
-                                                    context.Logger.LogInformation($"Vendor Name = {field.ValueDetection.Text}");
-                                                    VendorName = field.ValueDetection.Text;
-                                                }
+                                                context.Logger.LogInformation($"Vendor Name = {field.ValueDetection.Text}");
+                                                VendorName = field.ValueDetection.Text;
                                             }
-                                            else if (group.Types.Contains("RECEIVER"))
+                                        }
+                                        else if (group.Types.Contains("RECEIVER"))
+                                        {
+                                            if (field.Type.Text == "NAME")
                                             {
-                                                if (field.Type.Text == "NAME")
-                                                {
-                                                    context.Logger.LogInformation($"Receiver Name = {field.ValueDetection.Text}");
-                                                    ReceiverName = field.ValueDetection.Text;
-                                                }
+                                                context.Logger.LogInformation($"Receiver Name = {field.ValueDetection.Text}");
+                                                ReceiverName = field.ValueDetection.Text;
                                             }
-                                            else
+                                        }
+                                        else
+                                        {
+                                            if (field.Type.Text == "NAME")
                                             {
-                                                if (field.Type.Text == "NAME")
-                                                {
-                                                    context.Logger.LogInformation($"Name = {field.ValueDetection.Text}");
-                                                    OtherName = field.ValueDetection.Text;
-                                                }
+                                                context.Logger.LogInformation($"Name = {field.ValueDetection.Text}");
+                                                OtherName = field.ValueDetection.Text;
                                             }
                                         }
                                     }
-
-                                    // add to db-InvoiceDetails start
-
-                                    InvoiceDetails details = new InvoiceDetails();
-                                    details.InvoiceNumber = InvoiceNumber;
-                                    details.VendorName = VendorName;
-                                    details.FileName = file.Key;
-                                    if (ReceiverName != "")
-                                    {
-                                        details.ReceiverName = ReceiverName;
-                                    }
-                                    else if (ReceiverName != null)
-                                    {
-                                        details.ReceiverName = OtherName;
-                                    }
-                                    else
-                                    {
-                                        details.ReceiverName = OtherName;
-                                    }
-                                    using (var conn = new SqlConnection(connectionString))
-                                    {
-                                        context.Logger.LogInformation("Try to connect to RDS...");
-
-                                        conn.Open();
-
-                                        context.Logger.LogInformation("Successfully connected to RDS!");
-
-                                        SqlCommand cmd = new("INSERT INTO InvoiceDetails (InvoiceNumber, VendorName, ReceiverName, CreatedAt, FileName) VALUES ('" + details.InvoiceNumber + "', '" + details.VendorName + "', '" + details.ReceiverName + "', '" + DateTime.Now + "', '" + details.FileName + "');", conn);
-
-                                        cmd.ExecuteNonQuery();
-
-                                        context.Logger.LogInformation("Extracted File details inserted in database successfully!");
-
-                                        conn.Close();
-                                    }
-                                    //end
-
-                                    context.Logger.LogInformation($"{file.Key} - File has been extracted successfully!");
-
-                                    // Check to see if there are no more pages of data. If no then break.
-                                    if (string.IsNullOrEmpty(getExpenseAnalysisResponse.NextToken))
-                                    {
-                                        break;
-                                    }
-
-                                    GetExpenseAnalysis.NextToken = getExpenseAnalysisResponse.NextToken;
-                                    getExpenseAnalysisResponse = await textractClient.GetExpenseAnalysisAsync(GetExpenseAnalysis);
                                 }
 
+                            // add to db-InvoiceDetail start
+
+                                InvoiceDetail detail = new()
+                                {
+                                    InvoiceNumber = InvoiceNumber,
+                                    VendorName = VendorName,
+                                    FileName = file.Key
+                                };
+                                if (ReceiverName != "")
+                                {
+                                    detail.ReceiverName = ReceiverName;
+                                }
+                                else if (ReceiverName != null)
+                                {
+                                    detail.ReceiverName = OtherName;
+                                }
                                 else
                                 {
-                                    //add to db-ErrorLog start
-                                    ErrorLog log = new ErrorLog()
-                                    {
-                                        FileName = file.Key
-                                    };
-
-                                    using (var conn = new SqlConnection(connectionString))
-                                    {
-                                        context.Logger.LogInformation("Try to connect to RDS...");
-
-                                        conn.Open();
-
-                                        context.Logger.LogInformation("Successfully connected to RDS.");
-
-                                        SqlCommand cmd = new("INSERT INTO ErrorLogs (CreatedAt, FileName) VALUES ('" + DateTime.Now + "', '" + log.FileName + "');", conn);
-
-                                        cmd.ExecuteNonQuery();
-
-                                        context.Logger.LogInformation("Error File details inserted in database successfully!");
-
-                                        conn.Close();
-                                    }
-                                    //end
-
-                                    context.Logger.LogInformation($"{file.Key} - File has no summary fileds to extract. Please upload a valid Invoice or Reciept!");
+                                    detail.ReceiverName = OtherName;
                                 }
+                                using (var conn = new SqlConnection(connectionString))
+                                {
+                                    context.Logger.LogInformation("Try to connect to RDS...");
+
+                                    conn.Open();
+
+                                    context.Logger.LogInformation("Successfully connected to RDS!");
+
+                                    SqlCommand cmd = new("INSERT INTO InvoiceDetail (InvoiceNumber, VendorName, ReceiverName, CreatedAt, FileName) VALUES ('" + detail.InvoiceNumber + "', '" + detail.VendorName + "', '" + detail.ReceiverName + "', '" + DateTime.Now + "', '" + detail.FileName + "');", conn);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    context.Logger.LogInformation("Extracted File details inserted in database successfully!");
+
+                                    conn.Close();
+                                }
+                            //end
+
+                                context.Logger.LogInformation($"{file.Key} - File has been extracted successfully!");
+
+                                // Check to see if there are no more pages of data. If no then break.
+                                if (string.IsNullOrEmpty(getExpenseAnalysisResponse.NextToken))
+                                {
+                                    break;
+                                }
+
+                                GetExpenseAnalysis.NextToken = getExpenseAnalysisResponse.NextToken;
+                                getExpenseAnalysisResponse = await textractClient.GetExpenseAnalysisAsync(GetExpenseAnalysis);
                             }
-                        } while (!string.IsNullOrEmpty(getExpenseAnalysisResponse.NextToken));
-                    }
-                    else
-                    {
-                        context.Logger.LogInformation($"Job failed with message: {getExpenseAnalysisResponse.StatusMessage}");
-                    }
+
+                            else
+                            {
+                            //add to db-ErrorLog start
+                                ErrorLog log = new()
+                                {
+                                    FileName = file.Key
+                                };
+
+                                using (var conn = new SqlConnection(connectionString))
+                                {
+                                    context.Logger.LogInformation("Try to connect to RDS...");
+
+                                    conn.Open();
+
+                                    context.Logger.LogInformation("Successfully connected to RDS.");
+
+                                    SqlCommand cmd = new("INSERT INTO ErrorLog (CreatedAt, FileName) VALUES ('" + DateTime.Now + "', '" + log.FileName + "');", conn);
+
+                                    cmd.ExecuteNonQuery();
+
+                                    context.Logger.LogInformation("Error File details inserted in database successfully!");
+
+                                    conn.Close();
+                                }
+                            //end
+
+                                context.Logger.LogInformation($"{file.Key} - File has no summary fileds to extract. Please upload a valid Invoice or Reciept!");
+                            }
+                        }
+                    } while (!string.IsNullOrEmpty(getExpenseAnalysisResponse.NextToken));
+                }
+                else
+                {
+                    context.Logger.LogInformation($"Job failed with message: {getExpenseAnalysisResponse.StatusMessage}");
                 }
             }
             return response.Headers.ContentType;

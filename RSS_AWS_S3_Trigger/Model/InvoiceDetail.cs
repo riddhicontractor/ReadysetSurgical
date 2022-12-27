@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-public class InvoiceDetails
+public class InvoiceDetail
 {
     public int Id { get; set; }
     public string? InvoiceNumber { get; set; }

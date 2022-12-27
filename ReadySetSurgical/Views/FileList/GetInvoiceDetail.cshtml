@@ -3,6 +3,9 @@
     string[] TableHeaders = new string[] {
        "Id"
       ,"File Name"
+      ,"Invoice Number"
+      ,"Vendor Name"
+      ,"Receiver Name"
       ,"Created At"
     };
 }
@@ -16,9 +19,9 @@
         <div class="row center">
             <div class="col">
                 <a asp-controller="FileList"
-                   asp-action="SuccessIndex"><b>Success Files</b></a> |
+                   asp-action="GetInvoiceDetail"><b>Success Files</b></a> |
                 <a asp-controller="FileList"
-                   asp-action="ErrorIndex"><b>Error Files</b></a>
+                   asp-action="GetErrorLog"><b>Error Files</b></a>
             </div>
         </div>
         <br />
@@ -45,6 +48,9 @@
                                 <tr>
                                     <td>@Data.Id</td>
                                     <td>@Data.FileName</td>
+                                    <td>@Data.InvoiceNumber</td>
+                                    <td>@Data.VendorName</td>
+                                    <td>@Data.ReceiverName</td>
                                     <td>@Data.CreatedAt</td>
                                 </tr>
                             }

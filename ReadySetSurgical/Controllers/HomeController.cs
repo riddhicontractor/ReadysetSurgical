@@ -9,11 +9,19 @@ namespace ReadySetSurgical.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
+        /// <summary>
+        /// Constructs an instance with a preconfigured logger.
+        /// </summary>
+        /// <param name="logger"></param>
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// This method is called for every Home Controller invocation.
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Index()
         {
             return View();
