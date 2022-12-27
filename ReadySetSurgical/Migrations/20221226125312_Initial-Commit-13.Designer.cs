@@ -12,18 +12,37 @@ using ReadySetSurgical.Data;
 namespace ReadySetSurgical.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221202055232_Initial-Commit-1")]
-    partial class InitialCommit1
+    [Migration("20221226125312_Initial-Commit-13")]
+    partial class InitialCommit13
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.0")
+                .HasAnnotation("ProductVersion", "7.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ErrorLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("errorLogs");
+                });
 
             modelBuilder.Entity("InvoiceDetails", b =>
                 {

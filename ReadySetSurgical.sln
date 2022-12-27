@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadySetSurgical", "ReadySetSurgical\ReadySetSurgical.csproj", "{0D99249F-52A7-4B0D-8427-7ABCBC39CFED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS-S3-Lambda-Trigger", "..\AWS-S3-Lambda-Trigger\AWS-S3-Lambda-Trigger\AWS-S3-Lambda-Trigger.csproj", "{C06EB594-593C-47FA-8958-74592B20A780}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS-S3-Lambda-Trigger", "RSS_AWS_S3_Trigger\AWS-S3-Lambda-Trigger.csproj", "{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{0D99249F-52A7-4B0D-8427-7ABCBC39CFED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D99249F-52A7-4B0D-8427-7ABCBC39CFED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D99249F-52A7-4B0D-8427-7ABCBC39CFED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C06EB594-593C-47FA-8958-74592B20A780}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C06EB594-593C-47FA-8958-74592B20A780}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C06EB594-593C-47FA-8958-74592B20A780}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C06EB594-593C-47FA-8958-74592B20A780}.Release|Any CPU.Build.0 = Release|Any CPU
+		{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

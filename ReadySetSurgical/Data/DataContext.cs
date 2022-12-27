@@ -13,5 +13,7 @@ namespace ReadySetSurgical.Data
 
         }
         public DbSet<InvoiceDetails> invoiceDetails { get; set; }
+
+        public DbSet<ErrorLog> errorLogs { get; set; }
     }
 }
