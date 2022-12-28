@@ -1,4 +1,4 @@
-﻿using ReadySetSurgical.Models;
+﻿using ReadySetSurgical.Model;
 
 namespace ReadySetSurgical.InvoiceRepository
 {

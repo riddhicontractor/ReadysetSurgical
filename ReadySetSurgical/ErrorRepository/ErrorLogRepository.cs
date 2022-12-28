@@ -1,5 +1,5 @@
 ﻿using ReadySetSurgical.Data;
-using ReadySetSurgical.Models;
+using ReadySetSurgical.Model;
 
 namespace ReadySetSurgical.ErrorRepository
 {

@@ -5,6 +5,7 @@ using Amazon.Textract.Model;
 using Amazon.Textract;
 using Amazon;
 using System.Data.SqlClient;
+using ReadySetSurgical.Model;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
@@ -238,28 +239,26 @@ public class Function
     /// <returns></returns>
     private bool AddInvoiceDetails(InvoiceDetail invoiceDetail, ILambdaContext context)
     {
-        using (var conn = new SqlConnection(connectionString))
+        using var conn = new SqlConnection(connectionString);
+        context.Logger.LogInformation("Try to connect to RDS...");
+
+        conn.Open();
+
+        context.Logger.LogInformation("Successfully connected to RDS!");
+
+        SqlCommand cmd = new("INSERT INTO InvoiceDetail (InvoiceNumber, VendorName, ReceiverName, CreatedAt, FileName) VALUES ('" + invoiceDetail.InvoiceNumber + "', '" + invoiceDetail.VendorName + "', '" + invoiceDetail.ReceiverName + "', '" + DateTime.Now + "', '" + invoiceDetail.FileName + "');", conn);
+
+        int success = cmd.ExecuteNonQuery();
+
+        context.Logger.LogInformation("Extracted Invoice details inserted in database successfully!");
+
+        conn.Close();
+
+        if (success == 1)
         {
-            context.Logger.LogInformation("Try to connect to RDS...");
-
-            conn.Open();
-
-            context.Logger.LogInformation("Successfully connected to RDS!");
-
-            SqlCommand cmd = new("INSERT INTO InvoiceDetail (InvoiceNumber, VendorName, ReceiverName, CreatedAt, FileName) VALUES ('" + invoiceDetail.InvoiceNumber + "', '" + invoiceDetail.VendorName + "', '" + invoiceDetail.ReceiverName + "', '" + DateTime.Now + "', '" + invoiceDetail.FileName + "');", conn);
-
-            int success = cmd.ExecuteNonQuery();
-
-            context.Logger.LogInformation("Extracted Invoice details inserted in database successfully!");
-
-            conn.Close();
-
-            if (success == 1)
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
+        return false;
     }
 
     /// <summary>
@@ -270,27 +269,25 @@ public class Function
     /// <returns></returns>
     private bool AddErrorLogDetails(ErrorLog errorLog, ILambdaContext context)
     {
-        using (var conn = new SqlConnection(connectionString))
+        using var conn = new SqlConnection(connectionString);
+        context.Logger.LogInformation("Try to connect to RDS...");
+
+        conn.Open();
+
+        context.Logger.LogInformation("Successfully connected to RDS.");
+
+        SqlCommand cmd = new("INSERT INTO ErrorLog (CreatedAt, FileName) VALUES ('" + DateTime.Now + "', '" + errorLog.FileName + "');", conn);
+
+        int success = cmd.ExecuteNonQuery();
+
+        context.Logger.LogInformation("Error File details inserted in database successfully!");
+
+        conn.Close();
+
+        if (success == 1)
         {
-            context.Logger.LogInformation("Try to connect to RDS...");
-
-            conn.Open();
-
-            context.Logger.LogInformation("Successfully connected to RDS.");
-
-            SqlCommand cmd = new("INSERT INTO ErrorLog (CreatedAt, FileName) VALUES ('" + DateTime.Now + "', '" + errorLog.FileName + "');", conn);
-
-            int success = cmd.ExecuteNonQuery();
-
-            context.Logger.LogInformation("Error File details inserted in database successfully!");
-
-            conn.Close();
-
-            if (success == 1)
-            {
-                return true;
-            }
-            return false;
+            return true;
         }
+        return false;
     }
 }
