@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReadySetSurgical", "ReadySe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AWS-S3-Lambda-Trigger", "RSS_AWS_S3_Trigger\AWS-S3-Lambda-Trigger.csproj", "{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReadySetSurgical.Model", "ReadySetSurgical.Model\ReadySetSurgical.Model.csproj", "{E242ADBC-E3D5-4A6B-B731-2BE3402D5885}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{347D8CDB-1B6A-4436-8614-3F3D7AC32BD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E242ADBC-E3D5-4A6B-B731-2BE3402D5885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E242ADBC-E3D5-4A6B-B731-2BE3402D5885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E242ADBC-E3D5-4A6B-B731-2BE3402D5885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E242ADBC-E3D5-4A6B-B731-2BE3402D5885}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

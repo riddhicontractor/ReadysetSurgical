@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ReadySetSurgical.Models;
+using ReadySetSurgical.Model;
 
 namespace ReadySetSurgical.Data
 {

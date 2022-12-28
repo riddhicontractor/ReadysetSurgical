@@ -18,4 +18,7 @@
     <PackageReference Include="AWSSDK.Textract" Version="3.7.104.21" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ReadySetSurgical.Model\ReadySetSurgical.Model.csproj" />
+  </ItemGroup>
 </Project>
