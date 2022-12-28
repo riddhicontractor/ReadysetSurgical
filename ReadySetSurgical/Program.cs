@@ -1,7 +1,8 @@
 using Amazon.S3;
 using Microsoft.EntityFrameworkCore;
 using ReadySetSurgical.Data;
-using ReadySetSurgical.Repository;
+using ReadySetSurgical.ErrorRepository;
+using ReadySetSurgical.InvoiceRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Home}/{id?}");
 
 app.Run();

@@ -13,10 +13,10 @@ namespace AWS_S3_Lambda_Trigger;
 
 public class Function
 {
-    public string InvoiceNumber = string.Empty;
-    public string VendorName = string.Empty;
-    public string ReceiverName = string.Empty;
-    public string OtherName = string.Empty;
+    public string invoiceNumber = string.Empty;
+    public string vendorName = string.Empty;
+    public string receiverName = string.Empty;
+    public string otherName = string.Empty;
     public string connectionString = "server=sample-database.c53wji5mnp4g.ap-south-1.rds.amazonaws.com;User Id=Admin;Password=Jz7XXc8iqCHjJTL;database=sample;Trusted_Connection=True;TrustServerCertificate=Yes;Integrated Security=false;";
 
     IAmazonS3 S3Client { get; set; }
@@ -44,7 +44,6 @@ public class Function
     /// This method is called for every Lambda invocation. This method takes in an S3 event object and can be used 
     /// to respond to S3 notifications.
     /// It invokes the AWS Textract Expense API by passing the AWS S3 file and will extract data from it.
-    /// The extracted data will be stored in AWS RDS.
     /// </summary>
     /// <param name="evnt"></param>
     /// <param name="context"></param>
@@ -78,7 +77,7 @@ public class Function
                 {
                     DocumentLocation = new DocumentLocation
                     {
-                        S3Object = new Amazon.Textract.Model.S3Object
+                        S3Object = new S3Object
                         {
                             Bucket = file.BucketName,
                             Name = file.Key
@@ -129,7 +128,7 @@ public class Function
                                     if (field.Type.Text == "INVOICE_RECEIPT_ID")
                                     {
                                         context.Logger.LogInformation($"Invoice Id = {field.ValueDetection.Text}");
-                                        InvoiceNumber = field.ValueDetection.Text;
+                                        invoiceNumber = field.ValueDetection.Text;
                                     }
                                     List<ExpenseGroupProperty> _expenseGroupProperties = field.GroupProperties;
 
@@ -140,7 +139,7 @@ public class Function
                                             if (field.Type.Text == "NAME")
                                             {
                                                 context.Logger.LogInformation($"Vendor Name = {field.ValueDetection.Text}");
-                                                VendorName = field.ValueDetection.Text;
+                                                vendorName = field.ValueDetection.Text;
                                             }
                                         }
                                         else if (group.Types.Contains("RECEIVER"))
@@ -148,7 +147,7 @@ public class Function
                                             if (field.Type.Text == "NAME")
                                             {
                                                 context.Logger.LogInformation($"Receiver Name = {field.ValueDetection.Text}");
-                                                ReceiverName = field.ValueDetection.Text;
+                                                receiverName = field.ValueDetection.Text;
                                             }
                                         }
                                         else
@@ -156,51 +155,37 @@ public class Function
                                             if (field.Type.Text == "NAME")
                                             {
                                                 context.Logger.LogInformation($"Name = {field.ValueDetection.Text}");
-                                                OtherName = field.ValueDetection.Text;
+                                                otherName = field.ValueDetection.Text;
                                             }
                                         }
                                     }
                                 }
 
-                            // add to db-InvoiceDetail start
-
                                 InvoiceDetail detail = new()
                                 {
-                                    InvoiceNumber = InvoiceNumber,
-                                    VendorName = VendorName,
+                                    InvoiceNumber = invoiceNumber,
+                                    VendorName = vendorName,
                                     FileName = file.Key
                                 };
-                                if (ReceiverName != "")
+                                if (receiverName != "")
                                 {
-                                    detail.ReceiverName = ReceiverName;
+                                    detail.ReceiverName = receiverName;
                                 }
-                                else if (ReceiverName != null)
+                                else if (receiverName != null)
                                 {
-                                    detail.ReceiverName = OtherName;
+                                    detail.ReceiverName = otherName;
                                 }
                                 else
                                 {
-                                    detail.ReceiverName = OtherName;
+                                    detail.ReceiverName = otherName;
                                 }
-                                using (var conn = new SqlConnection(connectionString))
+
+                                bool isInvoiceDetailAdded = AddInvoiceDetails(detail, context);
+
+                                if (isInvoiceDetailAdded)
                                 {
-                                    context.Logger.LogInformation("Try to connect to RDS...");
-
-                                    conn.Open();
-
-                                    context.Logger.LogInformation("Successfully connected to RDS!");
-
-                                    SqlCommand cmd = new("INSERT INTO InvoiceDetail (InvoiceNumber, VendorName, ReceiverName, CreatedAt, FileName) VALUES ('" + detail.InvoiceNumber + "', '" + detail.VendorName + "', '" + detail.ReceiverName + "', '" + DateTime.Now + "', '" + detail.FileName + "');", conn);
-
-                                    cmd.ExecuteNonQuery();
-
-                                    context.Logger.LogInformation("Extracted File details inserted in database successfully!");
-
-                                    conn.Close();
+                                    context.Logger.LogInformation($"{file.Key} - File has been extracted successfully!");
                                 }
-                            //end
-
-                                context.Logger.LogInformation($"{file.Key} - File has been extracted successfully!");
 
                                 // Check to see if there are no more pages of data. If no then break.
                                 if (string.IsNullOrEmpty(getExpenseAnalysisResponse.NextToken))
@@ -214,31 +199,17 @@ public class Function
 
                             else
                             {
-                            //add to db-ErrorLog start
                                 ErrorLog log = new()
                                 {
                                     FileName = file.Key
                                 };
 
-                                using (var conn = new SqlConnection(connectionString))
+                                bool isErrorLogAdded = AddErrorLogDetails(log, context);
+
+                                if(isErrorLogAdded)
                                 {
-                                    context.Logger.LogInformation("Try to connect to RDS...");
-
-                                    conn.Open();
-
-                                    context.Logger.LogInformation("Successfully connected to RDS.");
-
-                                    SqlCommand cmd = new("INSERT INTO ErrorLog (CreatedAt, FileName) VALUES ('" + DateTime.Now + "', '" + log.FileName + "');", conn);
-
-                                    cmd.ExecuteNonQuery();
-
-                                    context.Logger.LogInformation("Error File details inserted in database successfully!");
-
-                                    conn.Close();
+                                    context.Logger.LogInformation($"{file.Key} - File has no summary fileds to extract. Please upload a valid Invoice or Reciept!");
                                 }
-                            //end
-
-                                context.Logger.LogInformation($"{file.Key} - File has no summary fileds to extract. Please upload a valid Invoice or Reciept!");
                             }
                         }
                     } while (!string.IsNullOrEmpty(getExpenseAnalysisResponse.NextToken));
@@ -256,6 +227,70 @@ public class Function
             context.Logger.LogInformation(e.Message);
             context.Logger.LogInformation(e.StackTrace);
             throw;
+        }
+    }
+
+    /// <summary>
+    /// This method takes the successfull extracted files from Textract API and will stored the extracted data in AWS RDS.
+    /// </summary>
+    /// <param name="invoiceDetail"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    private bool AddInvoiceDetails(InvoiceDetail invoiceDetail, ILambdaContext context)
+    {
+        using (var conn = new SqlConnection(connectionString))
+        {
+            context.Logger.LogInformation("Try to connect to RDS...");
+
+            conn.Open();
+
+            context.Logger.LogInformation("Successfully connected to RDS!");
+
+            SqlCommand cmd = new("INSERT INTO InvoiceDetail (InvoiceNumber, VendorName, ReceiverName, CreatedAt, FileName) VALUES ('" + invoiceDetail.InvoiceNumber + "', '" + invoiceDetail.VendorName + "', '" + invoiceDetail.ReceiverName + "', '" + DateTime.Now + "', '" + invoiceDetail.FileName + "');", conn);
+
+            int success = cmd.ExecuteNonQuery();
+
+            context.Logger.LogInformation("Extracted Invoice details inserted in database successfully!");
+
+            conn.Close();
+
+            if (success == 1)
+            {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// This method takes the invalid files and will stored the file details in AWS RDS.
+    /// </summary>
+    /// <param name="errorLog"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    private bool AddErrorLogDetails(ErrorLog errorLog, ILambdaContext context)
+    {
+        using (var conn = new SqlConnection(connectionString))
+        {
+            context.Logger.LogInformation("Try to connect to RDS...");
+
+            conn.Open();
+
+            context.Logger.LogInformation("Successfully connected to RDS.");
+
+            SqlCommand cmd = new("INSERT INTO ErrorLog (CreatedAt, FileName) VALUES ('" + DateTime.Now + "', '" + errorLog.FileName + "');", conn);
+
+            int success = cmd.ExecuteNonQuery();
+
+            context.Logger.LogInformation("Error File details inserted in database successfully!");
+
+            conn.Close();
+
+            if (success == 1)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

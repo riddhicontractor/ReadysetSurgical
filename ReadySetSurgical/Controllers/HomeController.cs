@@ -21,7 +21,7 @@ namespace ReadySetSurgical.Controllers
         /// This method is called for every Home Controller invocation.
         /// </summary>
         /// <returns></returns>
-        public IActionResult Index()
+        public IActionResult Home()
         {
             return View();
         }

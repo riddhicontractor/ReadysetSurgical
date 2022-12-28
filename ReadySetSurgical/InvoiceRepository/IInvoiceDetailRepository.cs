@@ -1,6 +1,6 @@
 ﻿using ReadySetSurgical.Models;
 
-namespace ReadySetSurgical.Repository
+namespace ReadySetSurgical.InvoiceRepository
 {
     public interface IInvoiceDetailRepository
     {

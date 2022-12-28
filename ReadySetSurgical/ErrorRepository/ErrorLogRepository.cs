@@ -1,9 +1,9 @@
 ﻿using ReadySetSurgical.Data;
 using ReadySetSurgical.Models;
 
-namespace ReadySetSurgical.Repository
+namespace ReadySetSurgical.ErrorRepository
 {
-    public class InvoiceDetailRepository : IInvoiceDetailRepository
+    public class ErrorLogRepository : IErrorLogRepository
     {
         private readonly DataContext _context;
 
@@ -11,19 +11,18 @@ namespace ReadySetSurgical.Repository
         /// Constructs an instance with a preconfigured datacontext.
         /// </summary>
         /// <param name="context"></param>
-        public InvoiceDetailRepository(DataContext context) 
+        public ErrorLogRepository(DataContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// It returns list of invoice details from RDS.
+        /// It returns list of error logs from RDS.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<InvoiceDetail> GetAllInvoiceDetail()
+        public IEnumerable<ErrorLog> GetAllErrorLog()
         {
-            return _context.InvoiceDetail.ToList();
+            return _context.Errorlog.ToList();
         }
-
     }
 }

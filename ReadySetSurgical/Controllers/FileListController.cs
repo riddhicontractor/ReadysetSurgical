@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ReadySetSurgical.Data;
-using ReadySetSurgical.Models;
-using ReadySetSurgical.Repository;
-using System.Data.SqlClient;
+using ReadySetSurgical.ErrorRepository;
+using ReadySetSurgical.InvoiceRepository;
 
 namespace ReadySetSurgical.Controllers
 {
@@ -27,7 +25,7 @@ namespace ReadySetSurgical.Controllers
         /// This method is called for every FileList Controller invocation.
         /// </summary>
         /// <returns></returns>
-        public IActionResult Index()
+        public IActionResult FileList()
         {
             return View();
         }
