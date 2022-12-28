@@ -1,10 +1,17 @@
 using Amazon.S3;
+using Microsoft.EntityFrameworkCore;
+using ReadySetSurgical.Data;
+using ReadySetSurgical.ErrorRepository;
+using ReadySetSurgical.InvoiceRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddAWSService<IAmazonS3>();
+builder.Services.AddScoped<IInvoiceDetailRepository,InvoiceDetailRepository>();
+builder.Services.AddScoped<IErrorLogRepository, ErrorLogRepository>();
+builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -24,6 +31,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Home}/{id?}");
 
 app.Run();

@@ -26,7 +26,7 @@
                                         </div>
                                         <div class="form-group">
                                             <div class="col">
-                                                <input type="submit" value="Upload" />
+                                                <input class="btn btn-primary" type="submit" value="Upload" />
                                             </div>
                                         </div>
                                     </form>
@@ -50,10 +50,6 @@
         <div class="alert alert-success">
             <spna>@ViewBag.FileCreated</spna>
         </div>
-        //if (!string.IsNullOrEmpty(ViewBag.msg))
-        //{
-        //    <script type="text/javascript">alert('@ViewBag.msg');</script>
-        //}
     }
 
     if (@ViewBag.FileFailedToUpload != null)
